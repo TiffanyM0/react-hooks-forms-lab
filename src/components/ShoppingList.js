@@ -3,65 +3,42 @@ import ItemForm from "./ItemForm";
 import Filter from "./Filter";
 import Item from "./Item";
 
-function ShoppingList({ items }) {
+function ShoppingList({ items: initialItems }) {
 
-  const [inputData, setInputData] = useState({
-    selectedCategory: "All",
-    searchCategory: "", 
-  })
-  // const [selectedCategory, setSelectedCategory] = useState("All");
-  // state of the input value defined
-  // const [searchCategory, setSearchCategory] = useState("")
+  const [items, setItems] = useState(initialItems);
 
-  const [search, setSearch] = useState("category")
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  function filterBy (){
-    
-    const itemsToDisplay = items.filter((item) => {
-      if (inputData.selectedCategory === "All") return true;
-      
-      return item.category === inputData.selectedCategory;
-    });
-    
-    const searchItems = itemsToDisplay.filter((item) => {
-      if (inputData.searchCategory === "") return true;
+  const [searchTerm, setSearchTerm] = useState("");
 
-      return item.name === inputData.searchCategory;
-    });
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+  };
 
-    console.log(searchItems)
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+  };
 
-    return search === "search" ? searchItems : itemsToDisplay;
+  const filteredItems = items.filter((item) => {
+    const categoryCondition =
+      selectedCategory === "All" || item.category === selectedCategory;
+    const searchCondition = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return categoryCondition && searchCondition;
+  });
 
-  }
-  // console.log(itemsToDisplay); becomes the filtered array
-  // console.log(inputData.selectedCategory)
-  // console.log(inputData.searchCategory); 
-  const arrayItems = filterBy();
-  console.log(arrayItems);
-  // switch between itemToDisplay and searchItems based on the input value;
+  const handleItemFormSubmit = (newItem) => {
+    setItems([...items, newItem]); // Add the new item to the list
+  };
 
   return (
     <div className="ShoppingList">
-      <ItemForm />
-
-      <Filter 
-        onCategoryChange={
-          (e)=> setInputData({
-            ...inputData, 
-            selectedCategory: (e.target.value)
-          })
-        } 
-        onSearchChange={
-          (e)=> setInputData({
-            ...inputData, 
-            searchCategory: (e.target.value)
-          })
-        }/>
-
+      <ItemForm onItemFormSubmit={handleItemFormSubmit} />
+      <Filter
+        onSearchChange={handleSearchChange}
+        onCategoryChange={handleCategoryChange}
+      />
       <ul className="Items">
-        {/* filtered array (itemsToDisplay) is itterated over */}
-        {arrayItems.map((item) => (
+        {filteredItems.map((item) => (
           <Item key={item.id} name={item.name} category={item.category} />
         ))}
       </ul>
