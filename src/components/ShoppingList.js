@@ -7,38 +7,61 @@ function ShoppingList({ items }) {
 
   const [inputData, setInputData] = useState({
     selectedCategory: "All",
-    searchCategory: "All", 
+    searchCategory: "", 
   })
   // const [selectedCategory, setSelectedCategory] = useState("All");
-
   // state of the input value defined
   // const [searchCategory, setSearchCategory] = useState("")
 
-  
-  const itemsToDisplay = items.filter((item) => {
-    if (inputData.selectedCategory === "All") return true;
+  const [search, setSearch] = useState("category")
+
+  function filterBy (){
     
-    return item.category === inputData.selectedCategory;
-  });
+    const itemsToDisplay = items.filter((item) => {
+      if (inputData.selectedCategory === "All") return true;
+      
+      return item.category === inputData.selectedCategory;
+    });
+    
+    const searchItems = itemsToDisplay.filter((item) => {
+      if (inputData.searchCategory === "") return true;
+
+      return item.name === inputData.searchCategory;
+    });
+
+    console.log(searchItems)
+
+    return search === "search" ? searchItems : itemsToDisplay;
+
+  }
   // console.log(itemsToDisplay); becomes the filtered array
-  console.log(inputData.selectedCategory)
+  // console.log(inputData.selectedCategory)
+  // console.log(inputData.searchCategory); 
+  const arrayItems = filterBy();
+  console.log(arrayItems);
+  // switch between itemToDisplay and searchItems based on the input value;
 
-  const searchItems = items.filter((item)=> {
-    if (inputData.searchCategory === "") return true;
-    return item.name === inputData.searchCategory;
-  })
-
-  console.log(inputData.searchCategory); 
-  
   return (
     <div className="ShoppingList">
       <ItemForm />
+
       <Filter 
-        onCategoryChange={(e)=> setInputData({...inputData, selectedCategory: (e.target.value)})} 
-        onSearchChange={(e)=> setInputData({...inputData, searchCategory: (e.target.value)})} />
+        onCategoryChange={
+          (e)=> setInputData({
+            ...inputData, 
+            selectedCategory: (e.target.value)
+          })
+        } 
+        onSearchChange={
+          (e)=> setInputData({
+            ...inputData, 
+            searchCategory: (e.target.value)
+          })
+        }/>
+
       <ul className="Items">
         {/* filtered array (itemsToDisplay) is itterated over */}
-        {itemsToDisplay.map((item) => (
+        {arrayItems.map((item) => (
           <Item key={item.id} name={item.name} category={item.category} />
         ))}
       </ul>
